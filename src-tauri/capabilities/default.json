@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The remote web app gets no access to native APIs.",
+  "windows": ["main"],
+  "permissions": []
+}

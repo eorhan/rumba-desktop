@@ -1,0 +1,21 @@
+[package]
+name = "rumba"
+version = "1.0.0"
+description = "Rumba — sesli sohbet ve mesajlaşma"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-opener = "2"
+
+# Small, fast binary: the app is only a thin shell around the system WebView2.
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

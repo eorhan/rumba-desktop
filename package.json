@@ -1,0 +1,10 @@
+{
+  "name": "rumba-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "tauri": "tauri",
+    "build:win": "tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc"
+  },
+  "devDependencies": { "@tauri-apps/cli": "2.1.0" }
+}
