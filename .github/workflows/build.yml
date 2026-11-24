@@ -17,7 +17,7 @@ jobs:
           - os: windows-latest
             rust-targets: ""
             args: "--bundles nsis"
-            glob: "src-tauri/target/release/bundle/nsis/*-setup.exe"
+            glob: "src-tauri/target/release/bundle/nsis/*-setup.exe*"
             name: windows
           - os: macos-latest
             rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
@@ -44,9 +44,13 @@ jobs:
         run: npm install
 
       # macOS builds are unsigned (no Apple Developer certificate); users bypass Gatekeeper on
-      # first launch. Windows builds are unsigned until the SignPath request is approved.
+      # first launch. Windows builds are unsigned for SmartScreen, but the auto-updater artifacts
+      # are signed with the Tauri minisign key so updates verify against the embedded public key.
       - name: Build
         run: npm run tauri build -- ${{ matrix.args }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
