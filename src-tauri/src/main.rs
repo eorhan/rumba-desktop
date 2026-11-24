@@ -34,13 +34,15 @@ fn main() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let handle = app.handle().clone();
-            WebviewWindowBuilder::new(app, "main", WebviewUrl::External(APP_URL.parse().unwrap()))
+            let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(APP_URL.parse().unwrap()))
                 .title("Rumba")
                 .inner_size(1280.0, 800.0)
                 .min_inner_size(940.0, 600.0)
                 .center()
                 .user_agent(DESKTOP_UA)
                 .background_color(tauri::window::Color(30, 31, 34, 255))
+                // Tell the web UI which OS it runs on (the UA is spoofed to Edge for Google).
+                .initialization_script(&format!("window.__RUMBA_OS__={:?};", std::env::consts::OS))
                 // Keep Rumba + Google auth in-app; send any other site to the system browser.
                 .on_navigation(move |url| {
                     if stays_in_app(url) {
@@ -53,8 +55,18 @@ fn main() {
                             false
                         }
                     }
-                })
-                .build()?;
+                });
+
+            // A dark, app-coloured title bar: transparent overlay on macOS (native traffic
+            // lights kept), frameless on Windows (the web UI draws its own window controls).
+            #[cfg(target_os = "macos")]
+            let builder = builder
+                .title_bar_style(tauri::TitleBarStyle::Overlay)
+                .hidden_title(true);
+            #[cfg(target_os = "windows")]
+            let builder = builder.decorations(false);
+
+            builder.build()?;
             Ok(())
         })
         .run(tauri::generate_context!())
