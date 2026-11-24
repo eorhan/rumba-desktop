@@ -48,7 +48,6 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![win_min, win_close, win_toggle, win_drag])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -59,9 +58,10 @@ fn main() {
                 .center()
                 .user_agent(DESKTOP_UA)
                 .background_color(tauri::window::Color(30, 31, 34, 255))
-                // Tell the web UI which OS it runs on (the UA is spoofed to Edge for Google), and
-                // that this build can open URLs in the system browser (Google sign-in, message links).
-                .initialization_script(&format!("window.__RUMBA_OS__={:?};window.__RUMBA_SYSBROWSER__=true;", std::env::consts::OS))
+                // Tell the web UI which OS it runs on (the UA is spoofed to Edge for Google), that
+                // this build can open URLs in the system browser (Google sign-in, message links),
+                // and its version (so the web UI can show a non-forced "new version" banner).
+                .initialization_script(&format!("window.__RUMBA_OS__={:?};window.__RUMBA_SYSBROWSER__=true;window.__RUMBA_VERSION__={:?};", std::env::consts::OS, env!("CARGO_PKG_VERSION")))
                 // Keep Rumba + Google auth in-app; send any other site to the system browser.
                 .on_navigation(move |url| {
                     if stays_in_app(url) {
@@ -129,24 +129,6 @@ fn main() {
                     }
                 }
             });
-
-            // Auto-update (Windows): check the server manifest on launch and, if a newer signed
-            // build exists, download, install and relaunch silently. No code-signing cert needed —
-            // updates are verified against the embedded minisign public key.
-            #[cfg(target_os = "windows")]
-            {
-                use tauri_plugin_updater::UpdaterExt;
-                let updater_handle = app.handle().clone();
-                tauri::async_runtime::spawn(async move {
-                    if let Ok(updater) = updater_handle.updater() {
-                        if let Ok(Some(update)) = updater.check().await {
-                            if update.download_and_install(|_, _| {}, || {}).await.is_ok() {
-                                updater_handle.restart();
-                            }
-                        }
-                    }
-                });
-            }
             Ok(())
         })
         .run(tauri::generate_context!())

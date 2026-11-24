@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Rumba",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "identifier": "tr.net.hesap.rumba",
   "build": {
     "frontendDist": "../dist"
@@ -13,17 +13,8 @@
     },
     "withGlobalTauri": true
   },
-  "plugins": {
-    "updater": {
-      "endpoints": [
-        "https://rumba.hesap.net.tr/indir/latest.json"
-      ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkwODEyRjIzMUZERDhBMDQKUldRRWl0MGZJeStCa05jd2FKSWFmNEJmcGZINTZ1czRUdXdLN2xZMGh4MHVMWXZqZlNDdmxjOWsK"
-    }
-  },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
     "targets": [
       "nsis"
     ],
