@@ -55,8 +55,9 @@ fn main() {
                 .center()
                 .user_agent(DESKTOP_UA)
                 .background_color(tauri::window::Color(30, 31, 34, 255))
-                // Tell the web UI which OS it runs on (the UA is spoofed to Edge for Google).
-                .initialization_script(&format!("window.__RUMBA_OS__={:?};", std::env::consts::OS))
+                // Tell the web UI which OS it runs on (the UA is spoofed to Edge for Google), and
+                // that this build can open URLs in the system browser (Google sign-in, message links).
+                .initialization_script(&format!("window.__RUMBA_OS__={:?};window.__RUMBA_SYSBROWSER__=true;", std::env::consts::OS))
                 // Keep Rumba + Google auth in-app; send any other site to the system browser.
                 .on_navigation(move |url| {
                     if stays_in_app(url) {
