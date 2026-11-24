@@ -45,7 +45,6 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![win_min, win_close, win_toggle, win_drag])
         .setup(|app| {
             let handle = app.handle().clone();
