@@ -21,6 +21,19 @@ fn stays_in_app(url: &tauri::Url) -> bool {
         || host == "accounts.youtube.com"
 }
 
+// Window controls and dragging are driven from the web UI via these commands, which call the
+// native window directly — more reliable for remotely-hosted content than the JS window API.
+#[tauri::command]
+fn win_min(window: tauri::Window) { let _ = window.minimize(); }
+#[tauri::command]
+fn win_close(window: tauri::Window) { let _ = window.close(); }
+#[tauri::command]
+fn win_toggle(window: tauri::Window) {
+    if window.is_maximized().unwrap_or(false) { let _ = window.unmaximize(); } else { let _ = window.maximize(); }
+}
+#[tauri::command]
+fn win_drag(window: tauri::Window) { let _ = window.start_dragging(); }
+
 fn main() {
     tauri::Builder::default()
         // Starting Rumba again just focuses the existing window.
@@ -32,6 +45,7 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![win_min, win_close, win_toggle, win_drag])
         .setup(|app| {
             let handle = app.handle().clone();
             let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(APP_URL.parse().unwrap()))
