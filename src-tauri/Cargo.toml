@@ -1,6 +1,6 @@
 [package]
 name = "rumba"
-version = "1.0.10"
+version = "1.0.11"
 description = "Rumba — sesli sohbet ve mesajlaşma"
 edition = "2021"
 
